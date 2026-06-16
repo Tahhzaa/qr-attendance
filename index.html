@@ -359,8 +359,8 @@
         <div id="modalIcon" class="loading-icon"></div>
       </div>
       <h2 id="modalTitle">กำลังบันทึก</h2>
-      <p id="modalMessage">ระบบกำลังบันทึกเวลาเข้างาน</p>
-      <div class="close-note">หน้าต่างนี้จะปิดอัตโนมัติ</div>
+
+
     </div>
   </div>
 
@@ -457,7 +457,6 @@
       return {
         type:'duplicate',
         title:'ลงทะเบียนซ้ำ',
-        message:'พนักงานคนนี้เช็คชื่อไปแล้ววันนี้'
       };
     }
 
@@ -468,14 +467,12 @@
       return {
         type:'success',
         title:'บันทึกสำเร็จ',
-        message:'เช็คชื่อสำเร็จ ระบบบันทึกสถานะมาสายแล้ว'
       };
     }
 
     return {
       type:'success',
       title:'เช็คชื่อสำเร็จ',
-      message:'บันทึกเวลาเข้างานเรียบร้อยแล้ว'
     };
   }
 
@@ -564,7 +561,6 @@
       finishAndClose({
         type:'success',
         title:'เช็คชื่อสำเร็จ',
-        message:'ส่งข้อมูลบันทึกเวลาเรียบร้อยแล้ว'
       });
     });
   }
