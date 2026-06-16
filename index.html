@@ -23,10 +23,7 @@
       background:radial-gradient(circle at top,#fff1e8,#ffffff 52%);
       color:var(--dark);
     }
-    .wrap{
-      max-width:520px;
-      margin:0 auto;
-    }
+    .wrap{max-width:520px;margin:0 auto;}
     .header{
       background:linear-gradient(135deg,var(--orange),#ff9a6b);
       color:#fff;
@@ -36,17 +33,8 @@
       box-shadow:0 18px 45px rgba(242,103,57,.25);
       margin-bottom:16px;
     }
-    .header h1{
-      margin:0;
-      font-size:28px;
-      font-weight:900;
-    }
-    .header p{
-      margin:8px 0 0;
-      font-size:15px;
-      font-weight:800;
-      opacity:.95;
-    }
+    .header h1{margin:0;font-size:28px;font-weight:900;}
+    .header p{margin:8px 0 0;font-size:15px;font-weight:800;opacity:.95;}
     .card{
       background:#fff;
       border:1px solid var(--border);
@@ -66,11 +54,6 @@
       font-family:inherit;
       margin-top:10px;
     }
-    .primary{
-      background:var(--orange);
-      color:#fff;
-      box-shadow:0 10px 25px rgba(242,103,57,.25);
-    }
     .secondary{
       background:#fff7ed;
       color:#9a3412;
@@ -82,9 +65,7 @@
       margin-top:14px;
       display:none;
     }
-    #reader.active{
-      display:block;
-    }
+    #reader.active{display:block;}
     .result{
       display:none;
       margin-top:14px;
@@ -107,7 +88,6 @@
       border:1px solid #fecaca;
     }
 
-    /* ================= MODAL STATUS ================= */
     .modal-overlay{
       position:fixed;
       inset:0;
@@ -122,9 +102,7 @@
       backdrop-filter:blur(10px);
       -webkit-backdrop-filter:blur(10px);
     }
-    .modal-overlay.show{
-      display:flex;
-    }
+    .modal-overlay.show{display:flex;}
     .status-modal{
       width:100%;
       max-width:420px;
@@ -156,18 +134,10 @@
       align-items:center;
       justify-content:center;
       font-size:42px;
-      background:linear-gradient(135deg,#F26739,#ff9a6b);
-      color:white;
-      box-shadow:0 16px 30px rgba(242,103,57,.26);
-      animation:iconBreath 1.6s ease-in-out infinite;
-    }
-    .modal-icon.success{
       background:linear-gradient(135deg,#16a34a,#22c55e);
+      color:white;
       box-shadow:0 16px 30px rgba(22,163,74,.24);
-    }
-    .modal-icon.error{
-      background:linear-gradient(135deg,#dc2626,#ef4444);
-      box-shadow:0 16px 30px rgba(220,38,38,.24);
+      animation:iconBreath 1.6s ease-in-out infinite;
     }
     .status-modal h2{
       margin:0;
@@ -182,32 +152,6 @@
       font-weight:800;
       line-height:1.6;
     }
-    .modal-loader{
-      width:100%;
-      height:10px;
-      margin-top:22px;
-      border-radius:999px;
-      background:#ffedd5;
-      overflow:hidden;
-    }
-    .modal-loader span{
-      display:block;
-      width:42%;
-      height:100%;
-      border-radius:999px;
-      background:linear-gradient(90deg,#F26739,#ffb088);
-      animation:loadingMove 1s ease-in-out infinite;
-    }
-    .modal-close-btn{
-      display:none;
-      margin-top:18px;
-      background:#F26739;
-      color:white;
-      box-shadow:0 10px 22px rgba(242,103,57,.22);
-    }
-    .modal-close-btn.show{
-      display:block;
-    }
     @keyframes modalPop{
       from{ opacity:0; transform:translateY(14px) scale(.94); }
       to{ opacity:1; transform:translateY(0) scale(1); }
@@ -215,10 +159,6 @@
     @keyframes iconBreath{
       0%,100%{ transform:scale(1); }
       50%{ transform:scale(1.06); }
-    }
-    @keyframes loadingMove{
-      0%{ transform:translateX(-120%); }
-      100%{ transform:translateX(260%); }
     }
   </style>
 </head>
@@ -231,12 +171,7 @@
     </div>
 
     <div class="card">
-      <button class="primary" onclick="startScanner()" style="display:none;">
-        เปิดกล้องสแกน QR
-      </button>
-
       <button class="secondary" onclick="stopScanner()">ปิดกล้อง</button>
-
       <div id="reader"></div>
       <div id="result" class="result"></div>
     </div>
@@ -244,22 +179,19 @@
 
   <div id="statusOverlay" class="modal-overlay">
     <div class="status-modal">
-      <div id="modalIcon" class="modal-icon">⏳</div>
-      <h2 id="modalTitle">กำลังบันทึก</h2>
-      <p id="modalMessage">ระบบกำลังบันทึกเวลาเข้างาน กรุณารอสักครู่</p>
-      <div id="modalLoader" class="modal-loader"><span></span></div>
-      <button id="modalCloseBtn" class="modal-close-btn" onclick="closeThisWindow()">ปิดหน้าต่างนี้</button>
+      <div class="modal-icon">✅</div>
+      <h2>สแกนสำเร็จ</h2>
+      <p>กำลังบันทึกเวลาเข้างาน<br>ระบบจะปิดหน้านี้อัตโนมัติ</p>
     </div>
   </div>
 
 <script>
   let scanner = null;
   let scanning = false;
+  let submitted = false;
 
   const params = new URLSearchParams(window.location.search);
-
   const apiUrl = params.get('api') || '';
-  const backUrl = params.get('back') || '';
 
   function showResult(message, isError){
     const box = document.getElementById('result');
@@ -267,42 +199,17 @@
     box.innerHTML = message;
   }
 
-  function showStatusModal(type, title, message, showCloseButton){
-    const overlay = document.getElementById('statusOverlay');
-    const icon = document.getElementById('modalIcon');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalMessage = document.getElementById('modalMessage');
-    const loader = document.getElementById('modalLoader');
-    const closeBtn = document.getElementById('modalCloseBtn');
-
-    icon.className = 'modal-icon';
-    if (type === 'success') {
-      icon.classList.add('success');
-      icon.innerHTML = '✅';
-      loader.style.display = 'none';
-    } else if (type === 'error') {
-      icon.classList.add('error');
-      icon.innerHTML = '⚠️';
-      loader.style.display = 'none';
-    } else {
-      icon.innerHTML = '⏳';
-      loader.style.display = 'block';
-    }
-
-    modalTitle.innerHTML = title || '';
-    modalMessage.innerHTML = message || '';
-    closeBtn.className = showCloseButton ? 'modal-close-btn show' : 'modal-close-btn';
-    overlay.classList.add('show');
+  function showSuccessModal(){
+    document.getElementById('statusOverlay').classList.add('show');
   }
 
-  function closeThisWindow(){
+  function forceCloseTab(){
+    window.open('', '_self');
     window.close();
 
     setTimeout(function(){
-      if (backUrl) {
-        window.location.href = backUrl;
-      }
-    }, 300);
+      document.body.innerHTML = '';
+    }, 800);
   }
 
   function cleanQRText(text){
@@ -323,28 +230,43 @@
   }
 
   function submitCheckin(rawText){
+    if (submitted) return;
+    submitted = true;
+
     const employeeId = cleanQRText(rawText);
 
     if (!employeeId) {
-      showStatusModal('error', 'QR ไม่ถูกต้อง', 'กรุณาลองสแกนใหม่อีกครั้ง', true);
+      showResult('QR ไม่ถูกต้อง', true);
+      submitted = false;
       return;
     }
 
     if (!apiUrl) {
-      showStatusModal('error', 'ไม่พบ API URL', 'ไม่สามารถเชื่อมต่อระบบบันทึกเวลาได้', true);
+      showResult('ไม่พบ API URL', true);
+      submitted = false;
       return;
     }
 
-    showStatusModal('loading', 'สแกนสำเร็จ', 'กำลังบันทึกเวลาเข้างาน...', false);
+    showSuccessModal();
 
     const target = apiUrl
       + '?action=checkin'
       + '&id=' + encodeURIComponent(employeeId)
-      + '&close=1'
-      + (backUrl ? '&back=' + encodeURIComponent(backUrl) : '');
+      + '&silent=1';
+
+    // ส่งข้อมูลแบบไม่เปลี่ยนหน้า เพื่อไม่ให้เห็นหน้า Apps Script
+    fetch(target, {
+      method: 'GET',
+      mode: 'no-cors',
+      keepalive: true
+    }).catch(function(){});
+
+    // เผื่อบาง browser ส่ง keepalive ไม่ทัน
+    const img = new Image();
+    img.src = target + '&t=' + Date.now();
 
     setTimeout(function(){
-      window.location.href = target;
+      forceCloseTab();
     }, 900);
   }
 
@@ -352,12 +274,12 @@
     const reader = document.getElementById('reader');
 
     if (!window.Html5Qrcode) {
-      showStatusModal('error', 'โหลดระบบสแกนไม่สำเร็จ', 'กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่', true);
+      showResult('โหลดระบบสแกน QR ไม่สำเร็จ', true);
       return;
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      showStatusModal('error', 'อุปกรณ์ไม่รองรับกล้อง', 'กรุณาเปิดด้วย Chrome หรือ Safari', true);
+      showResult('อุปกรณ์นี้ไม่รองรับการเปิดกล้อง', true);
       return;
     }
 
@@ -376,10 +298,10 @@
         stopScanner(true);
         submitCheckin(decodedText);
       }
-    ).catch(function(err){
+    ).catch(function(){
       scanning = false;
       reader.classList.remove('active');
-      showStatusModal('error', 'เปิดกล้องไม่ได้', 'กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari', true);
+      showResult('เปิดกล้องไม่ได้ กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari', true);
     });
   }
 
@@ -403,9 +325,7 @@
   }
 
   window.onload = function(){
-    if (!apiUrl) {
-      return;
-    }
+    if (!apiUrl) return;
 
     setTimeout(function(){
       startScanner();
