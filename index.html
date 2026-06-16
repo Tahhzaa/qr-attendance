@@ -145,7 +145,9 @@
     </div>
 
     <div class="card">
-      <button class="primary" onclick="startScanner()">เปิดกล้องสแกน QR</button>
+  <button class="primary" onclick="startScanner()" style="display:none;">
+  เปิดกล้องสแกน QR
+</button>
       <button class="secondary" onclick="stopScanner()">ปิดกล้อง</button>
 
       <div id="reader"></div>
@@ -277,11 +279,16 @@
     }
   }
 
-  window.onload = function(){
-    if (!apiUrl) {
-      showResult('เปิดหน้านี้จากปุ่ม “สแกน QR เช็คชื่อพนักงาน” ในโปรแกรมเดิม เพื่อเชื่อมกับ Google Sheet', true);
-    }
-  };
+window.onload = function(){
+  if (!apiUrl) {
+    showResult('เปิดหน้านี้จากปุ่ม “สแกน QR เช็คชื่อพนักงาน” ในโปรแกรมเดิม เพื่อเชื่อมกับ Google Sheet', true);
+    return;
+  }
+
+  setTimeout(function(){
+    startScanner();
+  }, 500);
+};
 </script>
 </body>
 </html>
