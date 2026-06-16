@@ -1,137 +1,287 @@
 <!DOCTYPE html>
-
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR Attendance</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Attendance Scanner</title>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
 
-<style>
-body{
-font-family:sans-serif;
-background:#f5f5f5;
-padding:20px;
-text-align:center;
-}
-
-.container{
-max-width:500px;
-margin:auto;
-background:white;
-padding:20px;
-border-radius:12px;
-box-shadow:0 5px 15px rgba(0,0,0,.1);
-}
-
-button{
-background:#F26739;
-color:white;
-border:none;
-padding:15px 25px;
-font-size:18px;
-border-radius:10px;
-cursor:pointer;
-}
-
-#reader{
-margin-top:20px;
-}
-
-.success{
-background:#dcfce7;
-color:#166534;
-padding:12px;
-margin-top:15px;
-border-radius:10px;
-display:none;
-}
-
-.error{
-background:#fee2e2;
-color:#991b1b;
-padding:12px;
-margin-top:15px;
-border-radius:10px;
-display:none;
-}
-</style>
-
+  <style>
+    :root{
+      --orange:#F26739;
+      --dark:#1f2937;
+      --cream:#fff8f2;
+      --green:#16a34a;
+      --red:#991b1b;
+      --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      padding:18px;
+      font-family:Arial,'Noto Sans Thai',sans-serif;
+      background:radial-gradient(circle at top,#fff1e8,#ffffff 52%);
+      color:var(--dark);
+    }
+    .wrap{
+      max-width:520px;
+      margin:0 auto;
+    }
+    .header{
+      background:linear-gradient(135deg,var(--orange),#ff9a6b);
+      color:#fff;
+      padding:24px 20px;
+      border-radius:28px;
+      text-align:center;
+      box-shadow:0 18px 45px rgba(242,103,57,.25);
+      margin-bottom:16px;
+    }
+    .header h1{
+      margin:0;
+      font-size:28px;
+      font-weight:900;
+    }
+    .header p{
+      margin:8px 0 0;
+      font-size:15px;
+      font-weight:800;
+      opacity:.95;
+    }
+    .card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:26px;
+      padding:20px;
+      box-shadow:0 12px 32px rgba(0,0,0,.08);
+      margin-bottom:14px;
+    }
+    button{
+      width:100%;
+      border:0;
+      border-radius:18px;
+      padding:16px;
+      font-size:18px;
+      font-weight:900;
+      cursor:pointer;
+      font-family:inherit;
+      margin-top:10px;
+    }
+    .primary{
+      background:var(--orange);
+      color:#fff;
+      box-shadow:0 10px 25px rgba(242,103,57,.25);
+    }
+    .secondary{
+      background:#fff7ed;
+      color:#9a3412;
+      border:1px solid #fed7aa;
+    }
+    .manual{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+      margin-top:12px;
+    }
+    input{
+      width:100%;
+      padding:14px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      font-size:18px;
+      font-family:inherit;
+      text-align:center;
+      text-transform:uppercase;
+    }
+    #reader{
+      overflow:hidden;
+      border-radius:22px;
+      margin-top:14px;
+      display:none;
+    }
+    #reader.active{
+      display:block;
+    }
+    .result{
+      display:none;
+      margin-top:14px;
+      padding:14px;
+      border-radius:18px;
+      font-weight:900;
+      text-align:center;
+      line-height:1.55;
+    }
+    .ok{
+      display:block;
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .bad{
+      display:block;
+      background:#fee2e2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+    .note{
+      margin-top:14px;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      color:#9a3412;
+      padding:14px;
+      border-radius:18px;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.6;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="wrap">
+    <div class="header">
+      <h1>📷 สแกน QR เช็คชื่อ</h1>
+      <p>ข้าวขาหมูอิสรภาพ Team Center</p>
+    </div>
 
-<div class="container">
+    <div class="card">
+      <button class="primary" onclick="startScanner()">เปิดกล้องสแกน QR</button>
+      <button class="secondary" onclick="stopScanner()">ปิดกล้อง</button>
 
-<h1>เช็คชื่อพนักงาน</h1>
+      <div id="reader"></div>
+      <div id="result" class="result"></div>
 
-<p>สแกน QR Code พนักงาน</p>
+      <div class="manual">
+        <input id="manualId" placeholder="หรือกรอกรหัส เช่น E001" onkeydown="if(event.key==='Enter') submitManual()">
+        <button class="secondary" onclick="submitManual()">เช็คชื่อด้วยรหัส</button>
+      </div>
 
-<button onclick="startScanner()">
-เปิดกล้อง
-</button>
-
-<div id="reader"></div>
-
-<div id="success" class="success"></div>
-<div id="error" class="error"></div>
-
-</div>
+      <div class="note">
+        QR ควรมีค่าเป็นรหัสพนักงาน เช่น <b>E001</b><br>
+        หรือเป็น URL ที่มี <b>?id=E001</b>, <b>?emp=E001</b>, <b>?employeeId=E001</b>
+      </div>
+    </div>
+  </div>
 
 <script>
+  let scanner = null;
+  let scanning = false;
 
-let scanner;
+  const params = new URLSearchParams(window.location.search);
 
-function startScanner(){
+  // จะถูกส่งมาจากปุ่มใน Apps Script เดิม
+  const apiUrl = params.get('api') || '';
+  const backUrl = params.get('back') || '';
 
-scanner = new Html5Qrcode("reader");
+  function showResult(message, isError){
+    const box = document.getElementById('result');
+    box.className = 'result ' + (isError ? 'bad' : 'ok');
+    box.innerHTML = message;
+  }
 
-scanner.start(
-{
-facingMode:"environment"
-},
-{
-fps:10,
-qrbox:250
-},
-onScanSuccess
-).catch(err=>{
-showError(err);
-});
+  function cleanQRText(text){
+    let raw = String(text || '').trim();
+    if (!raw) return '';
 
-}
+    try {
+      const url = new URL(raw);
+      return (
+        url.searchParams.get('emp') ||
+        url.searchParams.get('employeeId') ||
+        url.searchParams.get('id') ||
+        raw
+      ).trim();
+    } catch(e) {
+      return raw;
+    }
+  }
 
-function onScanSuccess(qrCodeMessage){
+  function submitCheckin(rawText){
+    const employeeId = cleanQRText(rawText);
+    if (!employeeId) {
+      showResult('QR หรือรหัสพนักงานไม่ถูกต้อง', true);
+      return;
+    }
 
-scanner.stop();
+    if (!apiUrl) {
+      showResult('ไม่พบ api URL กรุณาเปิดหน้านี้จากปุ่มในโปรแกรมเดิม', true);
+      return;
+    }
 
-document.getElementById("success").style.display="block";
-document.getElementById("success").innerHTML=
-"เช็คชื่อสำเร็จ : " + qrCodeMessage;
+    showResult('สแกนสำเร็จ กำลังบันทึก: ' + employeeId, false);
 
-/*
-ส่งข้อมูลเข้า Apps Script
+    const target = apiUrl
+      + '?action=checkin'
+      + '&id=' + encodeURIComponent(employeeId)
+      + (backUrl ? '&back=' + encodeURIComponent(backUrl) : '');
 
-fetch("YOUR_WEBAPP_URL",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-employeeId:qrCodeMessage
-})
-})
-*/
+    window.location.href = target;
+  }
 
-}
+  function submitManual(){
+    const value = document.getElementById('manualId').value;
+    submitCheckin(value);
+  }
 
-function showError(msg){
-document.getElementById("error").style.display="block";
-document.getElementById("error").innerHTML=msg;
-}
+  function startScanner(){
+    const reader = document.getElementById('reader');
 
+    if (!window.Html5Qrcode) {
+      showResult('โหลดระบบสแกน QR ไม่สำเร็จ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่', true);
+      return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showResult('อุปกรณ์นี้ไม่รองรับการเปิดกล้อง', true);
+      return;
+    }
+
+    if (scanning) return;
+
+    reader.classList.add('active');
+    showResult('กำลังเปิดกล้อง กรุณากดอนุญาต...', false);
+
+    scanner = scanner || new Html5Qrcode('reader');
+    scanning = true;
+
+    scanner.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      function(decodedText){
+        stopScanner(true);
+        submitCheckin(decodedText);
+      }
+    ).catch(function(err){
+      scanning = false;
+      reader.classList.remove('active');
+      showResult('เปิดกล้องไม่ได้ กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari: ' + (err && err.message ? err.message : err), true);
+    });
+  }
+
+  function stopScanner(keepBox){
+    const reader = document.getElementById('reader');
+
+    if (scanner && scanning) {
+      scanner.stop()
+        .then(function(){
+          scanning = false;
+          if (!keepBox) reader.classList.remove('active');
+        })
+        .catch(function(){
+          scanning = false;
+          if (!keepBox) reader.classList.remove('active');
+        });
+    } else {
+      scanning = false;
+      if (!keepBox) reader.classList.remove('active');
+    }
+  }
+
+  window.onload = function(){
+    if (!apiUrl) {
+      showResult('เปิดหน้านี้จากปุ่ม “สแกน QR เช็คชื่อพนักงาน” ในโปรแกรมเดิม เพื่อเชื่อมกับ Google Sheet', true);
+    }
+  };
 </script>
-
 </body>
 </html>
