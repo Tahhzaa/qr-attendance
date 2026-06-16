@@ -11,7 +11,6 @@
     :root{
       --orange:#F26739;
       --dark:#1f2937;
-      --cream:#fff8f2;
       --green:#16a34a;
       --red:#991b1b;
       --border:#e5e7eb;
@@ -77,22 +76,6 @@
       color:#9a3412;
       border:1px solid #fed7aa;
     }
-    .manual{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:8px;
-      margin-top:12px;
-    }
-    input{
-      width:100%;
-      padding:14px;
-      border:1px solid var(--border);
-      border-radius:16px;
-      font-size:18px;
-      font-family:inherit;
-      text-align:center;
-      text-transform:uppercase;
-    }
     #reader{
       overflow:hidden;
       border-radius:22px;
@@ -123,17 +106,6 @@
       color:#991b1b;
       border:1px solid #fecaca;
     }
-    .note{
-      margin-top:14px;
-      background:#fff7ed;
-      border:1px solid #fed7aa;
-      color:#9a3412;
-      padding:14px;
-      border-radius:18px;
-      font-size:14px;
-      font-weight:800;
-      line-height:1.6;
-    }
   </style>
 </head>
 
@@ -153,16 +125,6 @@
 
       <div id="reader"></div>
       <div id="result" class="result"></div>
-
-      <div class="manual">
-        <input id="manualId" placeholder="หรือกรอกรหัส เช่น E001" onkeydown="if(event.key==='Enter') submitManual()">
-        <button class="secondary" onclick="submitManual()">เช็คชื่อด้วยรหัส</button>
-      </div>
-
-      <div class="note">
-        QR ควรมีค่าเป็นรหัสพนักงาน เช่น <b>E001</b><br>
-        หรือเป็น URL ที่มี <b>?id=E001</b>, <b>?emp=E001</b>, <b>?employeeId=E001</b>
-      </div>
     </div>
   </div>
 
@@ -172,7 +134,6 @@
 
   const params = new URLSearchParams(window.location.search);
 
-  // จะถูกส่งมาจากปุ่มใน Apps Script เดิม
   const apiUrl = params.get('api') || '';
   const backUrl = params.get('back') || '';
 
@@ -202,16 +163,16 @@
   function submitCheckin(rawText){
     const employeeId = cleanQRText(rawText);
     if (!employeeId) {
-      showResult('QR หรือรหัสพนักงานไม่ถูกต้อง', true);
+      showResult('QR ไม่ถูกต้อง', true);
       return;
     }
 
     if (!apiUrl) {
-      showResult('ไม่พบ api URL กรุณาเปิดหน้านี้จากปุ่มในโปรแกรมเดิม', true);
+      showResult('ไม่พบ API URL', true);
       return;
     }
 
-    showResult('สแกนสำเร็จ กำลังบันทึก: ' + employeeId, false);
+    showResult('สแกนสำเร็จ กำลังบันทึก...', false);
 
     const target = apiUrl
       + '?action=checkin'
@@ -221,16 +182,11 @@
     window.location.href = target;
   }
 
-  function submitManual(){
-    const value = document.getElementById('manualId').value;
-    submitCheckin(value);
-  }
-
   function startScanner(){
     const reader = document.getElementById('reader');
 
     if (!window.Html5Qrcode) {
-      showResult('โหลดระบบสแกน QR ไม่สำเร็จ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่', true);
+      showResult('โหลดระบบสแกน QR ไม่สำเร็จ', true);
       return;
     }
 
@@ -242,7 +198,7 @@
     if (scanning) return;
 
     reader.classList.add('active');
-    showResult('กำลังเปิดกล้อง กรุณากดอนุญาต...', false);
+    showResult('กำลังเปิดกล้อง...', false);
 
     scanner = scanner || new Html5Qrcode('reader');
     scanning = true;
@@ -257,7 +213,7 @@
     ).catch(function(err){
       scanning = false;
       reader.classList.remove('active');
-      showResult('เปิดกล้องไม่ได้ กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari: ' + (err && err.message ? err.message : err), true);
+      showResult('เปิดกล้องไม่ได้ กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari', true);
     });
   }
 
@@ -282,7 +238,6 @@
 
   window.onload = function(){
     if (!apiUrl) {
-      showResult('เปิดหน้านี้จากปุ่ม “สแกน QR เช็คชื่อพนักงาน” ในโปรแกรมเดิม เพื่อเชื่อมกับ Google Sheet', true);
       return;
     }
 
