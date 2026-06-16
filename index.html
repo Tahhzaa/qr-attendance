@@ -106,6 +106,120 @@
       color:#991b1b;
       border:1px solid #fecaca;
     }
+
+    /* ================= MODAL STATUS ================= */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(242,103,57,.28), transparent 34%),
+        rgba(17,24,39,.62);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+    }
+    .modal-overlay.show{
+      display:flex;
+    }
+    .status-modal{
+      width:100%;
+      max-width:420px;
+      background:linear-gradient(180deg,#ffffff,#fff8f2);
+      border:1px solid #fed7aa;
+      border-radius:32px;
+      padding:28px 24px;
+      text-align:center;
+      box-shadow:0 30px 80px rgba(0,0,0,.28);
+      animation:modalPop .28s cubic-bezier(.22,1.25,.36,1);
+      overflow:hidden;
+      position:relative;
+    }
+    .status-modal::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:8px;
+      background:linear-gradient(90deg,#F26739,#ff9a6b,#F26739);
+    }
+    .modal-icon{
+      width:82px;
+      height:82px;
+      margin:4px auto 16px;
+      border-radius:28px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:42px;
+      background:linear-gradient(135deg,#F26739,#ff9a6b);
+      color:white;
+      box-shadow:0 16px 30px rgba(242,103,57,.26);
+      animation:iconBreath 1.6s ease-in-out infinite;
+    }
+    .modal-icon.success{
+      background:linear-gradient(135deg,#16a34a,#22c55e);
+      box-shadow:0 16px 30px rgba(22,163,74,.24);
+    }
+    .modal-icon.error{
+      background:linear-gradient(135deg,#dc2626,#ef4444);
+      box-shadow:0 16px 30px rgba(220,38,38,.24);
+    }
+    .status-modal h2{
+      margin:0;
+      font-size:26px;
+      font-weight:900;
+      color:#1f2937;
+    }
+    .status-modal p{
+      margin:10px 0 0;
+      color:#6b7280;
+      font-size:16px;
+      font-weight:800;
+      line-height:1.6;
+    }
+    .modal-loader{
+      width:100%;
+      height:10px;
+      margin-top:22px;
+      border-radius:999px;
+      background:#ffedd5;
+      overflow:hidden;
+    }
+    .modal-loader span{
+      display:block;
+      width:42%;
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#F26739,#ffb088);
+      animation:loadingMove 1s ease-in-out infinite;
+    }
+    .modal-close-btn{
+      display:none;
+      margin-top:18px;
+      background:#F26739;
+      color:white;
+      box-shadow:0 10px 22px rgba(242,103,57,.22);
+    }
+    .modal-close-btn.show{
+      display:block;
+    }
+    @keyframes modalPop{
+      from{ opacity:0; transform:translateY(14px) scale(.94); }
+      to{ opacity:1; transform:translateY(0) scale(1); }
+    }
+    @keyframes iconBreath{
+      0%,100%{ transform:scale(1); }
+      50%{ transform:scale(1.06); }
+    }
+    @keyframes loadingMove{
+      0%{ transform:translateX(-120%); }
+      100%{ transform:translateX(260%); }
+    }
   </style>
 </head>
 
@@ -128,6 +242,16 @@
     </div>
   </div>
 
+  <div id="statusOverlay" class="modal-overlay">
+    <div class="status-modal">
+      <div id="modalIcon" class="modal-icon">⏳</div>
+      <h2 id="modalTitle">กำลังบันทึก</h2>
+      <p id="modalMessage">ระบบกำลังบันทึกเวลาเข้างาน กรุณารอสักครู่</p>
+      <div id="modalLoader" class="modal-loader"><span></span></div>
+      <button id="modalCloseBtn" class="modal-close-btn" onclick="closeThisWindow()">ปิดหน้าต่างนี้</button>
+    </div>
+  </div>
+
 <script>
   let scanner = null;
   let scanning = false;
@@ -141,6 +265,44 @@
     const box = document.getElementById('result');
     box.className = 'result ' + (isError ? 'bad' : 'ok');
     box.innerHTML = message;
+  }
+
+  function showStatusModal(type, title, message, showCloseButton){
+    const overlay = document.getElementById('statusOverlay');
+    const icon = document.getElementById('modalIcon');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const loader = document.getElementById('modalLoader');
+    const closeBtn = document.getElementById('modalCloseBtn');
+
+    icon.className = 'modal-icon';
+    if (type === 'success') {
+      icon.classList.add('success');
+      icon.innerHTML = '✅';
+      loader.style.display = 'none';
+    } else if (type === 'error') {
+      icon.classList.add('error');
+      icon.innerHTML = '⚠️';
+      loader.style.display = 'none';
+    } else {
+      icon.innerHTML = '⏳';
+      loader.style.display = 'block';
+    }
+
+    modalTitle.innerHTML = title || '';
+    modalMessage.innerHTML = message || '';
+    closeBtn.className = showCloseButton ? 'modal-close-btn show' : 'modal-close-btn';
+    overlay.classList.add('show');
+  }
+
+  function closeThisWindow(){
+    window.close();
+
+    setTimeout(function(){
+      if (backUrl) {
+        window.location.href = backUrl;
+      }
+    }, 300);
   }
 
   function cleanQRText(text){
@@ -162,36 +324,40 @@
 
   function submitCheckin(rawText){
     const employeeId = cleanQRText(rawText);
+
     if (!employeeId) {
-      showResult('QR ไม่ถูกต้อง', true);
+      showStatusModal('error', 'QR ไม่ถูกต้อง', 'กรุณาลองสแกนใหม่อีกครั้ง', true);
       return;
     }
 
     if (!apiUrl) {
-      showResult('ไม่พบ API URL', true);
+      showStatusModal('error', 'ไม่พบ API URL', 'ไม่สามารถเชื่อมต่อระบบบันทึกเวลาได้', true);
       return;
     }
 
-    showResult('สแกนสำเร็จ กำลังบันทึก...', false);
+    showStatusModal('loading', 'สแกนสำเร็จ', 'กำลังบันทึกเวลาเข้างาน...', false);
 
     const target = apiUrl
       + '?action=checkin'
       + '&id=' + encodeURIComponent(employeeId)
+      + '&close=1'
       + (backUrl ? '&back=' + encodeURIComponent(backUrl) : '');
 
-    window.location.href = target;
+    setTimeout(function(){
+      window.location.href = target;
+    }, 900);
   }
 
   function startScanner(){
     const reader = document.getElementById('reader');
 
     if (!window.Html5Qrcode) {
-      showResult('โหลดระบบสแกน QR ไม่สำเร็จ', true);
+      showStatusModal('error', 'โหลดระบบสแกนไม่สำเร็จ', 'กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่', true);
       return;
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      showResult('อุปกรณ์นี้ไม่รองรับการเปิดกล้อง', true);
+      showStatusModal('error', 'อุปกรณ์ไม่รองรับกล้อง', 'กรุณาเปิดด้วย Chrome หรือ Safari', true);
       return;
     }
 
@@ -213,7 +379,7 @@
     ).catch(function(err){
       scanning = false;
       reader.classList.remove('active');
-      showResult('เปิดกล้องไม่ได้ กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari', true);
+      showStatusModal('error', 'เปิดกล้องไม่ได้', 'กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari', true);
     });
   }
 
