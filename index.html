@@ -602,7 +602,7 @@
     ).catch(function(){
       scanning = false;
       reader.classList.remove('active');
-      showModal('error', 'เปิดกล้องไม่ได้', 'กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari');
+
       setTimeout(closeScannerTab, 1800);
     });
   }
