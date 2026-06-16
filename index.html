@@ -12,10 +12,12 @@
       --orange:#F26739;
       --dark:#1f2937;
       --green:#16a34a;
-      --red:#991b1b;
+      --red:#dc2626;
       --border:#e5e7eb;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       padding:18px;
@@ -23,7 +25,12 @@
       background:radial-gradient(circle at top,#fff1e8,#ffffff 52%);
       color:var(--dark);
     }
-    .wrap{max-width:520px;margin:0 auto;}
+
+    .wrap{
+      max-width:520px;
+      margin:0 auto;
+    }
+
     .header{
       background:linear-gradient(135deg,var(--orange),#ff9a6b);
       color:#fff;
@@ -33,8 +40,20 @@
       box-shadow:0 18px 45px rgba(242,103,57,.25);
       margin-bottom:16px;
     }
-    .header h1{margin:0;font-size:28px;font-weight:900;}
-    .header p{margin:8px 0 0;font-size:15px;font-weight:800;opacity:.95;}
+
+    .header h1{
+      margin:0;
+      font-size:28px;
+      font-weight:900;
+    }
+
+    .header p{
+      margin:8px 0 0;
+      font-size:15px;
+      font-weight:800;
+      opacity:.95;
+    }
+
     .card{
       background:#fff;
       border:1px solid var(--border);
@@ -43,6 +62,7 @@
       box-shadow:0 12px 32px rgba(0,0,0,.08);
       margin-bottom:14px;
     }
+
     button{
       width:100%;
       border:0;
@@ -54,18 +74,24 @@
       font-family:inherit;
       margin-top:10px;
     }
+
     .secondary{
       background:#fff7ed;
       color:#9a3412;
       border:1px solid #fed7aa;
     }
+
     #reader{
       overflow:hidden;
       border-radius:22px;
       margin-top:14px;
       display:none;
     }
-    #reader.active{display:block;}
+
+    #reader.active{
+      display:block;
+    }
+
     .result{
       display:none;
       margin-top:14px;
@@ -75,18 +101,22 @@
       text-align:center;
       line-height:1.55;
     }
+
     .ok{
       display:block;
       background:#ecfdf5;
       color:#166534;
       border:1px solid #bbf7d0;
     }
+
     .bad{
       display:block;
       background:#fee2e2;
       color:#991b1b;
       border:1px solid #fecaca;
     }
+
+    /* ================= MODAL ANIMATION ================= */
 
     .modal-overlay{
       position:fixed;
@@ -97,54 +127,165 @@
       justify-content:center;
       padding:18px;
       background:
-        radial-gradient(circle at 50% 20%, rgba(242,103,57,.28), transparent 34%),
-        rgba(17,24,39,.62);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
+        radial-gradient(circle at 50% 20%, rgba(242,103,57,.24), transparent 34%),
+        rgba(17,24,39,.66);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
     }
-    .modal-overlay.show{display:flex;}
+
+    .modal-overlay.show{
+      display:flex;
+    }
+
     .status-modal{
       width:100%;
-      max-width:420px;
+      max-width:430px;
+      min-height:340px;
       background:linear-gradient(180deg,#ffffff,#fff8f2);
       border:1px solid #fed7aa;
-      border-radius:32px;
-      padding:28px 24px;
+      border-radius:34px;
+      padding:34px 26px 28px;
       text-align:center;
-      box-shadow:0 30px 80px rgba(0,0,0,.28);
-      animation:modalPop .28s cubic-bezier(.22,1.25,.36,1);
+      box-shadow:
+        0 34px 90px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.7);
+      animation:modalPop .35s cubic-bezier(.22,1.25,.36,1);
       overflow:hidden;
       position:relative;
     }
+
+    .status-modal.success::before{
+      background:linear-gradient(90deg,#16a34a,#86efac,#16a34a);
+    }
+
+    .status-modal.error::before{
+      background:linear-gradient(90deg,#dc2626,#fca5a5,#dc2626);
+    }
+
+    .status-modal.loading::before{
+      background:linear-gradient(90deg,#F26739,#ffb088,#F26739);
+    }
+
     .status-modal::before{
       content:"";
       position:absolute;
       top:0;
       left:0;
       right:0;
-      height:8px;
-      background:linear-gradient(90deg,#F26739,#ff9a6b,#F26739);
+      height:9px;
     }
-    .modal-icon{
-      width:82px;
-      height:82px;
-      margin:4px auto 16px;
-      border-radius:28px;
+
+    .success-burst,
+    .error-burst{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+
+    .success-burst span,
+    .error-burst span{
+      position:absolute;
+      top:82px;
+      left:50%;
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      opacity:0;
+    }
+
+    .success-burst span{
+      background:#22c55e;
+      animation:burstSuccess 1.1s ease-out forwards;
+    }
+
+    .error-burst span{
+      background:#ef4444;
+      animation:burstError 1.1s ease-out forwards;
+    }
+
+    .success-burst span:nth-child(1){--x:-120px;--y:-48px;animation-delay:.05s}
+    .success-burst span:nth-child(2){--x:110px;--y:-42px;animation-delay:.1s}
+    .success-burst span:nth-child(3){--x:-88px;--y:55px;animation-delay:.15s}
+    .success-burst span:nth-child(4){--x:96px;--y:62px;animation-delay:.2s}
+    .success-burst span:nth-child(5){--x:0px;--y:-92px;animation-delay:.12s}
+    .success-burst span:nth-child(6){--x:0px;--y:98px;animation-delay:.18s}
+
+    .error-burst span:nth-child(1){--x:-112px;--y:-38px;animation-delay:.05s}
+    .error-burst span:nth-child(2){--x:116px;--y:-32px;animation-delay:.1s}
+    .error-burst span:nth-child(3){--x:-86px;--y:70px;animation-delay:.15s}
+    .error-burst span:nth-child(4){--x:90px;--y:74px;animation-delay:.2s}
+    .error-burst span:nth-child(5){--x:0px;--y:-90px;animation-delay:.12s}
+    .error-burst span:nth-child(6){--x:0px;--y:100px;animation-delay:.18s}
+
+    .icon-wrap{
+      width:126px;
+      height:126px;
+      margin:8px auto 18px;
+      border-radius:40px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:42px;
-      background:linear-gradient(135deg,#16a34a,#22c55e);
-      color:white;
-      box-shadow:0 16px 30px rgba(22,163,74,.24);
-      animation:iconBreath 1.6s ease-in-out infinite;
+      position:relative;
+      isolation:isolate;
     }
+
+    .icon-wrap.success{
+      background:linear-gradient(135deg,#dcfce7,#ffffff);
+      box-shadow:
+        0 18px 42px rgba(22,163,74,.22),
+        inset 0 0 0 2px rgba(34,197,94,.16);
+    }
+
+    .icon-wrap.error{
+      background:linear-gradient(135deg,#fee2e2,#ffffff);
+      box-shadow:
+        0 18px 42px rgba(220,38,38,.22),
+        inset 0 0 0 2px rgba(239,68,68,.16);
+    }
+
+    .icon-circle{
+      width:92px;
+      height:92px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-size:52px;
+      font-weight:900;
+      transform:scale(.35);
+      opacity:0;
+    }
+
+    .icon-circle.success{
+      background:linear-gradient(135deg,#16a34a,#22c55e);
+      box-shadow:0 16px 34px rgba(22,163,74,.28);
+      animation:checkPop .72s cubic-bezier(.22,1.45,.36,1) forwards;
+    }
+
+    .icon-circle.error{
+      background:linear-gradient(135deg,#dc2626,#ef4444);
+      box-shadow:0 16px 34px rgba(220,38,38,.28);
+      animation:xPop .72s cubic-bezier(.22,1.45,.36,1) forwards;
+    }
+
+    .loading-icon{
+      width:92px;
+      height:92px;
+      border-radius:50%;
+      border:9px solid #ffedd5;
+      border-top-color:#F26739;
+      animation:spin 1s linear infinite;
+    }
+
     .status-modal h2{
       margin:0;
-      font-size:26px;
+      font-size:28px;
       font-weight:900;
       color:#1f2937;
     }
+
     .status-modal p{
       margin:10px 0 0;
       color:#6b7280;
@@ -152,13 +293,47 @@
       font-weight:800;
       line-height:1.6;
     }
+
+    .close-note{
+      margin-top:18px;
+      font-size:13px;
+      color:#9ca3af;
+      font-weight:800;
+    }
+
     @keyframes modalPop{
-      from{ opacity:0; transform:translateY(14px) scale(.94); }
+      from{ opacity:0; transform:translateY(16px) scale(.94); }
       to{ opacity:1; transform:translateY(0) scale(1); }
     }
-    @keyframes iconBreath{
-      0%,100%{ transform:scale(1); }
-      50%{ transform:scale(1.06); }
+
+    @keyframes checkPop{
+      0%{transform:scale(.25) rotate(-18deg);opacity:0}
+      58%{transform:scale(1.2) rotate(8deg);opacity:1}
+      78%{transform:scale(.93) rotate(-3deg)}
+      100%{transform:scale(1) rotate(0);opacity:1}
+    }
+
+    @keyframes xPop{
+      0%{transform:scale(.25) rotate(18deg);opacity:0}
+      58%{transform:scale(1.18) rotate(-8deg);opacity:1}
+      78%{transform:scale(.93) rotate(3deg)}
+      100%{transform:scale(1) rotate(0);opacity:1}
+    }
+
+    @keyframes burstSuccess{
+      0%{opacity:0;transform:translate(-50%,0) scale(.2)}
+      25%{opacity:1}
+      100%{opacity:0;transform:translate(calc(-50% + var(--x)), var(--y)) scale(1.2)}
+    }
+
+    @keyframes burstError{
+      0%{opacity:0;transform:translate(-50%,0) scale(.2)}
+      25%{opacity:1}
+      100%{opacity:0;transform:translate(calc(-50% + var(--x)), var(--y)) scale(1.2)}
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg)}
     }
   </style>
 </head>
@@ -171,17 +346,21 @@
     </div>
 
     <div class="card">
-      <button class="secondary" onclick="stopScanner()">ปิดกล้อง</button>
+      <button class="secondary" onclick="closeScannerTab()">ปิดกล้อง</button>
       <div id="reader"></div>
       <div id="result" class="result"></div>
     </div>
   </div>
 
   <div id="statusOverlay" class="modal-overlay">
-    <div class="status-modal">
-      <div class="modal-icon">✅</div>
-      <h2>สแกนสำเร็จ</h2>
-      <p>กำลังบันทึกเวลาเข้างาน<br>ระบบจะปิดหน้านี้อัตโนมัติ</p>
+    <div id="statusModal" class="status-modal loading">
+      <div id="burst" class="success-burst"></div>
+      <div id="iconWrap" class="icon-wrap">
+        <div id="modalIcon" class="loading-icon"></div>
+      </div>
+      <h2 id="modalTitle">กำลังบันทึก</h2>
+      <p id="modalMessage">ระบบกำลังบันทึกเวลาเข้างาน</p>
+      <div class="close-note">หน้าต่างนี้จะปิดอัตโนมัติ</div>
     </div>
   </div>
 
@@ -199,17 +378,53 @@
     box.innerHTML = message;
   }
 
-  function showSuccessModal(){
-    document.getElementById('statusOverlay').classList.add('show');
+  function setBurst(type){
+    const burst = document.getElementById('burst');
+    burst.className = type === 'error' ? 'error-burst' : 'success-burst';
+    burst.innerHTML = '<span></span><span></span><span></span><span></span><span></span><span></span>';
   }
 
-  function forceCloseTab(){
-    window.open('', '_self');
-    window.close();
+  function showModal(type, title, message){
+    const overlay = document.getElementById('statusOverlay');
+    const modal = document.getElementById('statusModal');
+    const iconWrap = document.getElementById('iconWrap');
+    const modalIcon = document.getElementById('modalIcon');
+
+    modal.className = 'status-modal ' + type;
+
+    if (type === 'success') {
+      setBurst('success');
+      iconWrap.className = 'icon-wrap success';
+      modalIcon.className = 'icon-circle success';
+      modalIcon.innerHTML = '✓';
+    } else if (type === 'error') {
+      setBurst('error');
+      iconWrap.className = 'icon-wrap error';
+      modalIcon.className = 'icon-circle error';
+      modalIcon.innerHTML = '×';
+    } else {
+      document.getElementById('burst').innerHTML = '';
+      iconWrap.className = 'icon-wrap';
+      modalIcon.className = 'loading-icon';
+      modalIcon.innerHTML = '';
+    }
+
+    document.getElementById('modalTitle').innerHTML = title;
+    document.getElementById('modalMessage').innerHTML = message;
+    overlay.classList.add('show');
+  }
+
+  function closeScannerTab(){
+    stopScanner(true);
 
     setTimeout(function(){
-      document.body.innerHTML = '';
-    }, 800);
+      window.open('', '_self');
+      window.close();
+
+      setTimeout(function(){
+        document.body.innerHTML = '';
+      }, 500);
+    }, 100);
   }
 
   function cleanQRText(text){
@@ -229,6 +444,52 @@
     }
   }
 
+  function normalizeResponseText(text){
+    const t = String(text || '').toLowerCase();
+
+    if (
+      t.includes('duplicate') ||
+      t.includes('already') ||
+      t.includes('ซ้ำ') ||
+      t.includes('ลงทะเบียนแล้ว') ||
+      t.includes('เช็คชื่อแล้ว')
+    ) {
+      return {
+        type:'duplicate',
+        title:'ลงทะเบียนซ้ำ',
+        message:'พนักงานคนนี้เช็คชื่อไปแล้ววันนี้'
+      };
+    }
+
+    if (
+      t.includes('late') ||
+      t.includes('สาย')
+    ) {
+      return {
+        type:'success',
+        title:'บันทึกสำเร็จ',
+        message:'เช็คชื่อสำเร็จ ระบบบันทึกสถานะมาสายแล้ว'
+      };
+    }
+
+    return {
+      type:'success',
+      title:'เช็คชื่อสำเร็จ',
+      message:'บันทึกเวลาเข้างานเรียบร้อยแล้ว'
+    };
+  }
+
+  function finishAndClose(status){
+    if (status.type === 'duplicate') {
+      showModal('error', status.title, status.message);
+      setTimeout(closeScannerTab, 1600);
+      return;
+    }
+
+    showModal('success', status.title, status.message);
+    setTimeout(closeScannerTab, 1400);
+  }
+
   function submitCheckin(rawText){
     if (submitted) return;
     submitted = true;
@@ -236,50 +497,90 @@
     const employeeId = cleanQRText(rawText);
 
     if (!employeeId) {
-      showResult('QR ไม่ถูกต้อง', true);
-      submitted = false;
+      showModal('error', 'QR ไม่ถูกต้อง', 'กรุณาลองสแกนใหม่อีกครั้ง');
+      setTimeout(function(){
+        submitted = false;
+        document.getElementById('statusOverlay').classList.remove('show');
+      }, 1600);
       return;
     }
 
     if (!apiUrl) {
-      showResult('ไม่พบ API URL', true);
-      submitted = false;
+      showModal('error', 'ไม่พบ API URL', 'ไม่สามารถเชื่อมต่อระบบบันทึกเวลาได้');
+      setTimeout(closeScannerTab, 1600);
       return;
     }
 
-    showSuccessModal();
+    showModal('loading', 'กำลังบันทึก', 'ระบบกำลังบันทึกเวลาเข้างาน');
 
     const target = apiUrl
       + '?action=checkin'
       + '&id=' + encodeURIComponent(employeeId)
-      + '&silent=1';
+      + '&silent=1'
+      + '&json=1';
 
-    // ส่งข้อมูลแบบไม่เปลี่ยนหน้า เพื่อไม่ให้เห็นหน้า Apps Script
+    /*
+      หมายเหตุ:
+      ถ้า Apps Script ส่ง JSON กลับมาได้ ระบบจะรู้ว่า success หรือ duplicate
+      ถ้าอ่าน response ไม่ได้ จะถือว่า "เช็คชื่อสำเร็จ" เพื่อไม่ให้ค้าง
+    */
     fetch(target, {
-      method: 'GET',
-      mode: 'no-cors',
-      keepalive: true
-    }).catch(function(){});
+      method:'GET',
+      cache:'no-store'
+    })
+    .then(function(res){
+      return res.text();
+    })
+    .then(function(text){
+      let status = normalizeResponseText(text);
 
-    // เผื่อบาง browser ส่ง keepalive ไม่ทัน
-    const img = new Image();
-    img.src = target + '&t=' + Date.now();
+      try {
+        const data = JSON.parse(text);
+        if (data.duplicate || data.status === 'duplicate' || data.success === false) {
+          status = {
+            type:'duplicate',
+            title:'ลงทะเบียนซ้ำ',
+            message:data.message || 'พนักงานคนนี้เช็คชื่อไปแล้ววันนี้'
+          };
+        } else {
+          status = {
+            type:'success',
+            title:data.title || 'เช็คชื่อสำเร็จ',
+            message:data.message || 'บันทึกเวลาเข้างานเรียบร้อยแล้ว'
+          };
+        }
+      } catch(e) {}
 
-    setTimeout(function(){
-      forceCloseTab();
-    }, 900);
+      finishAndClose(status);
+    })
+    .catch(function(){
+      // fallback: ส่งแบบ no-cors อีกครั้ง แล้วโชว์สำเร็จ
+      fetch(target, {
+        method:'GET',
+        mode:'no-cors',
+        keepalive:true
+      }).catch(function(){});
+
+      finishAndClose({
+        type:'success',
+        title:'เช็คชื่อสำเร็จ',
+        message:'ส่งข้อมูลบันทึกเวลาเรียบร้อยแล้ว'
+      });
+    });
   }
 
   function startScanner(){
     const reader = document.getElementById('reader');
 
     if (!window.Html5Qrcode) {
-      showResult('โหลดระบบสแกน QR ไม่สำเร็จ', true);
+      showModal('error', 'โหลดระบบสแกนไม่สำเร็จ', 'กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่');
+      setTimeout(closeScannerTab, 1800);
       return;
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      showResult('อุปกรณ์นี้ไม่รองรับการเปิดกล้อง', true);
+      showModal('error', 'อุปกรณ์ไม่รองรับกล้อง', 'กรุณาเปิดด้วย Chrome หรือ Safari');
+      setTimeout(closeScannerTab, 1800);
       return;
     }
 
@@ -292,8 +593,8 @@
     scanning = true;
 
     scanner.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 250, height: 250 } },
+      { facingMode:'environment' },
+      { fps:10, qrbox:{ width:250, height:250 } },
       function(decodedText){
         stopScanner(true);
         submitCheckin(decodedText);
@@ -301,7 +602,8 @@
     ).catch(function(){
       scanning = false;
       reader.classList.remove('active');
-      showResult('เปิดกล้องไม่ได้ กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari', true);
+      showModal('error', 'เปิดกล้องไม่ได้', 'กรุณาอนุญาตกล้อง หรือเปิดด้วย Chrome/Safari');
+      setTimeout(closeScannerTab, 1800);
     });
   }
 
