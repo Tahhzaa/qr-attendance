@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Attendance Scanner</title>
+  <title>ระบบสแกรน QR</title>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -43,7 +43,7 @@
 
     .header h1{
       margin:0;
-      font-size:28px;
+      font-size:26px;
       font-weight:900;
     }
 
@@ -139,12 +139,12 @@
 
     .status-modal{
       width:100%;
-      max-width:430px;
-      min-height:340px;
+      max-width:320px;
+      min-height:220px;
       background:linear-gradient(180deg,#ffffff,#fff8f2);
       border:1px solid #fed7aa;
       border-radius:34px;
-      padding:34px 26px 28px;
+      padding:30px 22px 24px;
       text-align:center;
       box-shadow:
         0 34px 90px rgba(0,0,0,.30),
@@ -219,10 +219,10 @@
     .error-burst span:nth-child(6){--x:0px;--y:100px;animation-delay:.18s}
 
     .icon-wrap{
-      width:126px;
-      height:126px;
-      margin:8px auto 18px;
-      border-radius:40px;
+      width:110px;
+      height:110px;
+      margin:4px auto 16px;
+      border-radius:34px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -245,14 +245,14 @@
     }
 
     .icon-circle{
-      width:92px;
-      height:92px;
+      width:82px;
+      height:82px;
       border-radius:50%;
       display:flex;
       align-items:center;
       justify-content:center;
       color:white;
-      font-size:52px;
+      font-size:48px;
       font-weight:900;
       transform:scale(.35);
       opacity:0;
@@ -271,8 +271,8 @@
     }
 
     .loading-icon{
-      width:92px;
-      height:92px;
+      width:82px;
+      height:82px;
       border-radius:50%;
       border:9px solid #ffedd5;
       border-top-color:#F26739;
@@ -281,7 +281,7 @@
 
     .status-modal h2{
       margin:0;
-      font-size:28px;
+      font-size:26px;
       font-weight:900;
       color:#1f2937;
     }
@@ -384,7 +384,7 @@
     burst.innerHTML = '<span></span><span></span><span></span><span></span><span></span><span></span>';
   }
 
-  function showModal(type, title, message){
+  function showModal(type, title){
     const overlay = document.getElementById('statusOverlay');
     const modal = document.getElementById('statusModal');
     const iconWrap = document.getElementById('iconWrap');
@@ -410,7 +410,6 @@
     }
 
     document.getElementById('modalTitle').innerHTML = title;
-    document.getElementById('modalMessage').innerHTML = message;
     overlay.classList.add('show');
   }
 
@@ -456,35 +455,25 @@
     ) {
       return {
         type:'duplicate',
-        title:'ลงทะเบียนซ้ำ',
-      };
-    }
-
-    if (
-      t.includes('late') ||
-      t.includes('สาย')
-    ) {
-      return {
-        type:'success',
-        title:'บันทึกสำเร็จ',
+        title:'ลงทะเบียนซ้ำ'
       };
     }
 
     return {
       type:'success',
-      title:'เช็คชื่อสำเร็จ',
+      title:'ลงทะเบียนสำเร็จ'
     };
   }
 
   function finishAndClose(status){
     if (status.type === 'duplicate') {
-      showModal('error', status.title, status.message);
-      setTimeout(closeScannerTab, 1600);
+      showModal('error', 'ลงทะเบียนซ้ำ');
+      setTimeout(closeScannerTab, 1400);
       return;
     }
 
-    showModal('success', status.title, status.message);
-    setTimeout(closeScannerTab, 1400);
+    showModal('success', 'ลงทะเบียนสำเร็จ');
+    setTimeout(closeScannerTab, 1200);
   }
 
   function submitCheckin(rawText){
@@ -494,7 +483,7 @@
     const employeeId = cleanQRText(rawText);
 
     if (!employeeId) {
-      showModal('error', 'QR ไม่ถูกต้อง', 'กรุณาลองสแกนใหม่อีกครั้ง');
+      showModal('error', 'QR ไม่ถูกต้อง');
       setTimeout(function(){
         submitted = false;
         document.getElementById('statusOverlay').classList.remove('show');
@@ -503,12 +492,12 @@
     }
 
     if (!apiUrl) {
-      showModal('error', 'ไม่พบ API URL', 'ไม่สามารถเชื่อมต่อระบบบันทึกเวลาได้');
+      showModal('error', 'ไม่พบ API');
       setTimeout(closeScannerTab, 1600);
       return;
     }
 
-    showModal('loading', 'กำลังบันทึก', 'ระบบกำลังบันทึกเวลาเข้างาน');
+    showModal('loading', 'กำลังบันทึก');
 
     const target = apiUrl
       + '?action=checkin'
@@ -536,14 +525,12 @@
         if (data.duplicate || data.status === 'duplicate' || data.success === false) {
           status = {
             type:'duplicate',
-            title:'ลงทะเบียนซ้ำ',
-            message:data.message || 'พนักงานคนนี้เช็คชื่อไปแล้ววันนี้'
+            title:'ลงทะเบียนซ้ำ'
           };
         } else {
           status = {
             type:'success',
-            title:data.title || 'เช็คชื่อสำเร็จ',
-            message:data.message || 'บันทึกเวลาเข้างานเรียบร้อยแล้ว'
+            title:'ลงทะเบียนสำเร็จ'
           };
         }
       } catch(e) {}
@@ -560,7 +547,7 @@
 
       finishAndClose({
         type:'success',
-        title:'เช็คชื่อสำเร็จ',
+        title:'ลงทะเบียนสำเร็จ',
       });
     });
   }
@@ -569,13 +556,13 @@
     const reader = document.getElementById('reader');
 
     if (!window.Html5Qrcode) {
-      showModal('error', 'โหลดระบบสแกนไม่สำเร็จ', 'กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่');
+      showModal('error', 'เปิดกล้องไม่ได้');
       setTimeout(closeScannerTab, 1800);
       return;
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      showModal('error', 'อุปกรณ์ไม่รองรับกล้อง', 'กรุณาเปิดด้วย Chrome หรือ Safari');
+      showModal('error', 'เปิดกล้องไม่ได้');
       setTimeout(closeScannerTab, 1800);
       return;
     }
